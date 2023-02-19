@@ -61,20 +61,14 @@ Set& Set::operator= (const Set& oldSet){
 
 //destructor
 Set::~Set(){
-    //only delete head if Set is empty
-    if(empty()) delete head;
-    else{
-        //traverse through Set starting @ first element
-        Node* p = head->next;
-        while(p != head){
-            //delete element pointed to by p
-            Node* nextNode = p->next;
-            delete p;
-            //increment
-            p = nextNode;
-        }
-        //delete head at the end
-        delete head;
+    //traverse through Set starting @ first element
+    Node* p = head->next;
+    //delete node pointed to by head first
+    delete head;
+    while(p != head){
+        Node* nextNode = p->next;
+        delete p;
+        p = nextNode;
     }
 }
 
@@ -98,12 +92,11 @@ bool Set::insert(const ItemType& value){
     insert->value = value;
     Node* p = head;
     
-    if(!empty()){
-        //stops at the first node smaller than value
-        while(p->next != head && value > p->next->value){
-            p = p->next;
-        }
+    //stops at the first node smaller than value
+    while(p->next != head && value > p->next->value){
+        p = p->next;
     }
+    
     Node *nextNode = p->next;
     insert->next = nextNode;
     nextNode->prev = insert;
@@ -182,32 +175,35 @@ void Set::swap(Set& other){
 
 //non-member functions
 void unite(const Set& s1, const Set& s2, Set& result){
-    //set result to s1 (calls assignment operator)
-    result = s1;
+    //create a temporary set and set it to s1 (calls assignment operator)
+    Set tempResult = s1;
     ItemType value;
     //traverse through s2
     int count = 0;
     while(count < s2.size()){
         //insert value in s2 to result
         s2.get(count, value);
-        result.insert(value);
+        tempResult.insert(value);
         count++;
     }
+    result = tempResult;
 }
 
 //values that appear in s1, but not s2
 void butNot(const Set& s1, const Set& s2, Set& result){
-    //set result to s1 (calls assignment operator)
-    result = s1;
+    //create a temporary set and set it to s1 (calls assignment operator)
+    Set tempResult = s1;
     ItemType value;
     //traverse through s2
     int count = 0;
     while(count < s2.size()){
-        //erase value from result if s2 contains the same value
+        //erase value from temp if s2 contains the same value
         s2.get(count, value);
-        if(result.contains(value)){
-            result.erase(value);
+        if(tempResult.contains(value)){
+            tempResult.erase(value);
         }
         count++;
     }
+    //set the resulting set to temp
+    result = tempResult;
 }
